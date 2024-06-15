@@ -1,0 +1,189 @@
+<div class="card">
+  <form [formGroup]="field" (ngSubmit)="addField()">
+    <div class="card-header border-0">
+      <div class="card-title d-flex align-items-center">
+        <h2 class="text-dark">Add field</h2>
+      </div>
+      <div class="card-toolbar">
+        <button type="submit" [disabled]="!this.field.valid" class="btn btn-sm btn-light-primary ms-3">
+          <span class="fw-semibold fs-4">Add Field</span>
+        </button>
+      </div>
+    </div>
+    <div class="card-body pt-0">
+      <div class="d-flex flew-column gap-2">
+  
+        <div class="d-flex flex-column gap-2">
+          <label class="fs-6 fw-semibold  required">Select Section:
+          </label>
+          <ng-select class="custom-ng-select" formControlName="section" placeholder="Choose section.." required>
+            <ng-option *ngFor="let section of sections; let i = index" [value]="section.id">
+              <span class=""> {{ i + 1}} </span>
+              {{ section.label }}
+            </ng-option>
+          </ng-select>
+        </div>
+  
+        <div class="d-flex flex-column gap-2">
+          <label class="fs-6 fw-semibold required">Type: </label>
+            <ng-select class="custom-ng-select" formControlName="type" placeholder="Choose type..">
+              <ng-option *ngFor="let type of fieldType" [value]="type">
+                {{ type.replace("_", " ") | titlecase }}
+              </ng-option>
+            </ng-select>
+        </div>
+  
+        <div class="d-flex flex-column gap-2">
+          <label class="fs-6 fw-semibold required">Question: </label>
+          <textarea type="text" formControlName="name" placeholder="Enter a question" class="form-control form-control-solid"></textarea>
+        </div>
+  
+        <div class="d-flex flex-column gap-2">
+          <label class="fs-6 fw-semibold">Description: </label>
+          <textarea type="text" formControlName="description" placeholder="Enter a description" class="form-control form-control-solid"></textarea>
+        </div>
+  
+        <div class="d-flex flex-column gap-2" *ngIf="!['date_picker', 'date_range', 'label'].includes(field.controls['type'].value)">
+          <label class="fs-6 fw-semibold">Placeholder: </label>
+          <input type="text" formControlName="placeholder" maxlength="200" placeholder="Enter a placeholder" class="form-control form-control-solid" />
+        </div>
+  
+        <div class="d-flex flex-column gap-2">
+          <label class="fs-6 fw-semibold required">Options: </label>
+          <div class="d-flex flex-column gap-2">
+            <div *ngFor="let form of options.controls; let i = index" formArrayName="options">
+              <div class="row align-items-center p-2" [formGroupName]="i">
+                <div class="col-9">
+                  <div class="d-flex align-items-baseline">
+                    <span class="fs-6 fw-semibold pe-2">{{ i + 1 }}.</span>
+                    <input type="text" class="form-control form-control-solid" placeholder="Enter a option"
+                      formControlName="name" />
+                  </div>
+                </div>
+                <div class="col-3" *ngIf="i > 1">
+                  <button type="button" class="btn btn-sm btn-light-danger ms-3" (click)="removeOption(i)">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="d-flex justify-content-center" role="button" (click)="addOption()">
+                <div class="w-75 border border-primary rounded p-1">
+                  <div class="d-flex justify-content-center align-items-center">
+                    <i class="fa-solid fa-plus text-primary"></i>
+                    <span class="px-2 text-primary">Option</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- #region File Upload Settings -->
+        <ng-container *ngIf="field.controls['type'].value === 'file_upload'" [formGroup]="file_settings">
+          <div class="d-flex flex-row gap-2 align-items-center">
+            <label class="fs-6 fw-semibold ">Allow only specific file types: </label>
+            <div class="form-check form-check-solid form-switch fv-row">
+              <input class="form-check-input w-45px h-30px" type="checkbox" formControlName="restricted"/>
+            </div>
+          </div>
+  
+          <div class="d-flex flex-column gap-2" *ngIf="file_settings.controls['restricted']">
+            <div *ngFor="let ext of file_extenstions.controls; let i = index" formArrayName="extensions">
+              <div [formGroupName]="i">
+                <div class="form-check ms-11 p-2">
+                  <input class="form-check-input" type="checkbox" [id]="'file-' + i" [value]="ext.value.value"
+                    formControlName="selected" />
+                  <label class="form-check-label" [for]="'file-' + i">
+                    {{ ext.value.label | titlecase }}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <div class="d-flex flex-column gap-2">
+            <label class="fs-6 fw-semibold">Maximum number of files:
+            </label>
+            <ng-select class="custom-ng-select" placeholder="Choose section.." formControlName="file_max">
+              <ng-option [value]="1">1</ng-option>
+              <ng-option [value]="2">2</ng-option>
+              <ng-option [value]="3">3</ng-option>
+              <ng-option [value]="5">5</ng-option>
+            </ng-select>
+          </div>
+  
+          <div class="d-flex flex-column gap-2">
+            <label class="fs-6 fw-semibold">Maximum file size:
+            </label>
+            <ng-select class="custom-ng-select" placeholder="Choose section.." formControlName="file_max_size">
+              <ng-option [value]="2000000">2 MB</ng-option>
+              <ng-option [value]="5000000">5 MB</ng-option>
+              <ng-option [value]="50000000">50 MB</ng-option>
+              <ng-option [value]="100000000">100 MB</ng-option>
+              <ng-option [value]="1000000000">1 GB</ng-option>
+            </ng-select>
+          </div>
+  
+        </ng-container>
+        <!-- #endregion -->
+  
+        <!-- #region Default Value -->
+        <div class="d-flex flex-column gap-2" *ngIf="field.controls['type'].value !== 'label'">
+          <label class="fs-6 fw-semibold"> Default Value: </label>
+          <input [type]="setInputType()" *ngIf="['short_answer', 'number', 'time'].includes(field.controls['type'].value)" formControlName="value" placeholder="Enter default value" class="form-control form-control-solid"/>
+  
+          <textarea class="form-control form-control-solid" formControlName="value" cols="30" rows="2"
+            placeholder="Enter default value" *ngIf="this.field.controls['type'].value == 'paragraph'"></textarea>
+  
+          <ng-select class="custom-ng-select" formControlName="value" 
+            [placeholder]="this.field.controls['type'].value == 'checkbox' ? 'Select multiple default values' : 'Select a default value'" 
+            [multiple]="this.field.controls['type'].value == 'checkbox' ? true : false" 
+            *ngIf="['dropdown', 'multiple_choice', 'checkbox'].includes(field.controls['type'].value)">
+            <ng-option *ngFor="let opt of options.value" [value]="opt.id">
+              {{ opt.name }}
+            </ng-option>
+          </ng-select>
+  
+          <div *ngIf="['date_range', 'date_picker'].includes(field.controls['type'].value)" class="d-flex flex-row align-items-center">
+            <label class="fs-7 fw-semibold  me-2">
+              Current Date
+            </label>
+            <div class="form-check form-check-solid form-switch fv-row">
+              <input class="form-check-input w-45px h-30px" type="checkbox" formControlName="value" />
+            </div>
+          </div>
+  
+          <div *ngIf="this.field.controls['type'].value == 'toggle'"
+            class="form-check form-check-solid form-switch fv-row">
+            <input class="form-check-input w-45px h-30px" type="checkbox" formControlName="value" />
+          </div>
+        </div>
+        <!-- #endregion -->
+  
+        <div class="d-flex flex-column gap-2">
+          <label class="fs-6 fw-semibold required">Field Size:</label>
+          <ng-select class="custom-ng-select" formControlName="size" placeholder="Type.." appendTo="body">
+            <ng-option [value]="25">25</ng-option>
+            <ng-option [value]="50">50</ng-option>
+            <ng-option [value]="75">75</ng-option>
+            <ng-option [value]="100">100</ng-option>
+          </ng-select>
+        </div>
+  
+        <div class="d-flex flex-column gap-2">
+          <div class="col d-flex flex-row gap-2">
+            <input class="form-check-input ms-2" type="checkbox" formControlName="required"/>
+            <label class="fs-6 fw-semibold  ps-2">Required </label>
+          </div>
+          <div class="col d-flex flex-row gap-2">
+            <input class="form-check-input ms-2" type="checkbox" formControlName="readOnly" />
+            <label class="fs-6 fw-semibold  ps-2">Disabled </label>
+          </div>
+        </div>
+  
+      </div>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,298 @@
+<ng-container *ngIf="section$ | async as sections">
+  <div class="loading">
+    <form [formGroup]="form">
+      <ng-container *ngIf="sections.length > 1; else normal">
+        <!--begin::Stepper-->
+        <div class="stepper stepper-pills my-stepper-container p-3">
+          <!--begin::Nav-->
+          <div class="stepper-nav justify-content-evenly mb-5">
+            <!--begin::Step-->
+            <div class="stepper-item my-4 {{ i === 0 ? 'current' : '' }}" data-kt-stepper-element="nav"
+              *ngFor="let section of sections; let i = index">
+              <!--begin::Wrapper-->
+              <div class="stepper-wrapper w-50px p-2">
+                <!--begin::Icon-->
+                <div class="stepper-icon mb-3 d-flex justify-content-center align-items-center" role="button">
+                  <span class="stepper-check fw-bold fs-3"> {{ i + 1 }} </span>
+                  <span class="stepper-number"> {{ i + 1 }} </span>
+                </div>
+                <!--end::Icon-->
+
+                <!--begin::Label-->
+                <div class="stepper-label d-flex justify-content-center align-items-center">
+                  <h5 class="stepper-title text-center">
+                    {{ section.label }}
+                  </h5>
+                </div>
+                <!--end::Label-->
+              </div>
+              <!--end::Wrapper-->
+
+              <!--begin::Line-->
+              <div class="stepper-line h-40px"></div>
+              <!--end::Line-->
+            </div>
+            <!--end::Step-->
+          </div>
+          <!--end::Nav-->
+
+          <div class="mb-5">
+            <div [ngClass]="{ current: i === 0 }" data-kt-stepper-element="content" [formGroupName]="section.id"
+              *ngFor="let section of sections; let i = index">
+              <div class="w-100">
+                <div class="card-header border-0">
+                  <div class="card-title d-flex align-items-center">
+                    <h2>{{ section.label }}</h2>
+                  </div>
+                  <div class="card-subtitle">
+                    <span class="text-muted fs-6">
+                      {{ section.description }}
+                    </span>
+                  </div>
+                </div>
+                <div class="card-body pt-0">
+                  <div class="row">
+                    <div *ngFor="let field of section.fields" class="p-2 fv-row mt-3" [ngClass]="{'col-12': field.size === 100, 'col-3': field.size === 25, 'col-6': field.size === 50, 'col-9': field.size === 75 }">
+                      <label class="fs-5 fw-semibold" [ngClass]="{'required': field.required && !field.disabled }">
+                        {{ field.label }}
+                      </label>
+                      <pre class="text-muted">{{ field.description }}</pre>
+                      <ng-container *ngTemplateOutlet="fieldTypes; context: { field: field, section: section }"></ng-container>
+                    </div>
+                  </div>
+                  <div class="d-flex flex-stack gap-2 p-2">
+                    <button type="button" class="btn btn-primary" data-kt-stepper-action="previous">
+                      Previous
+                    </button>
+                    <button type="button" class="btn btn-primary" data-kt-stepper-action="next">
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--end::Stepper-->
+      </ng-container>
+      <ng-template #normal>
+        <div class="mb-5">
+          <div *ngFor="let section of sections; let i = index" [formGroupName]="section.id" class="p-3">
+            <div class="card-header border-0">
+              <div class="card-title d-flex align-items-center">
+                <h2>{{ section.label }}</h2>
+              </div>
+              <div class="card-subtitle">
+                <span class="text-muted fs-6">{{ section.description }}</span>
+              </div>
+            </div>
+            <div class="card-body pt-0">
+              <div class="row">
+                <div *ngFor="let field of section.fields" class="p-2 fv-row mt-3" [ngClass]="{'col-12': field.size === 100, 'col-3': field.size === 25, 'col-6': field.size === 50, 'col-9': field.size === 75 }">
+                  <label class="fs-5 fw-semibold" [ngClass]="{'required': field.required && !field.disabled }">
+                    {{ field.label }}
+                  </label>
+                  <pre class="text-muted">{{ field.description }}</pre>
+                  <ng-container *ngTemplateOutlet="fieldTypes; context: { field: field, section: section }"></ng-container>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template #fieldTypes let-field="field" let-section="section">
+        <div [formGroupName]="section.id">
+          <ng-container *ngIf="field.type === 'toggle'">
+            <div class="form-check form-check-solid form-switch fv-row">
+              <input class="form-check-input w-45px h-30px" type="checkbox" [id]="field.id" [formControlName]="field.id"/>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="field.type === 'date_picker'">
+            
+          </ng-container>
+
+          <ng-container *ngIf="field.type === 'date_range'">
+        
+          </ng-container>
+
+          <ng-container *ngIf="field.type === 'time'">
+            <input type="time" [formControlName]="field.id" [placeholder]="field.placeholder" class="form-control form-control-solid"/>
+          </ng-container>
+
+          <ng-container *ngIf="field.type === 'paragraph'">
+            <textarea type="text" cols="30" rows="2" [formControlName]="field.id" [placeholder]="field.placeholder" class="form-control form-control-solid"></textarea>
+          </ng-container>
+
+          <ng-container *ngIf="field.type === 'short_answer'">
+            <input type="text" [formControlName]="field.id" class="form-control form-control-solid" [placeholder]="field.placeholder"/>
+          </ng-container>
+
+          <ng-container *ngIf="field.type === 'number'">
+            <input type="number" [placeholder]="field.placeholder" [formControlName]="field.id" class="form-control form-control-solid" />
+          </ng-container>
+
+          <ng-container *ngIf="field.type === 'dropdown'">
+            <ng-select class="custom-ng-select" [formControlName]="field.id" [placeholder]="field.placeholder">
+              <ng-container *ngIf="field.options.length > 0; else noItems">
+                <ng-option *ngFor="let opt of field.options" [value]="opt.option.name">{{ opt.option.name }}</ng-option>
+              </ng-container>
+              <ng-template #noItems>
+                <ng-option [disabled]="true">No items found.</ng-option>
+              </ng-template>
+            </ng-select>
+          </ng-container>
+
+          <ng-container *ngIf="field.type === 'multiple_choice'">
+            <div class="form-check ms-6 p-2" *ngFor="let opt of field.options; let i = index">
+              <input class="form-check-input" type="radio" [id]="'radio-' + i" [value]="opt.option.id" [formControlName]="field.id"/>
+              <label class="form-check-label" [for]="'radio-' + i">
+                {{ opt.option.name }}
+              </label>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="field.type === 'checkbox'">
+            <div [formArrayName]="field.id">
+              <div class="form-check ms-6 p-2" *ngFor="let opt of choices(section.id, field.id).controls; let i = index">
+                <div [formGroupName]="i">
+                  <input class="form-check-input" type="checkbox" [id]="'checkbox-' + i" formControlName="selected"/>
+                  <label [for]="'checkbox-' + i">
+                    {{ opt.value.option.name }}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- <ng-container *ngIf="!ticket_id">
+            <ng-container *ngIf="
+                field.type === 'file_upload' &&
+                field.settings?.file_max === 1 &&
+                field.readonly === false
+              ">
+              <div class="fv-row mb-2">
+                <ngx-dropzone (change)="onUpload($event, control, section.id)"
+                  [maxFileSize]="maxFileSize(field.settings?.file_max_size)"
+                  [accept]="fileSpecific(field.settings?.file_extensions)" [multiple]="false">
+                  <ngx-dropzone-label>
+                    <h3 class="fs-5 fw-bold text-gray-900 mb-1">
+                      {{
+                      field.placeholder
+                      ? field.placeholder
+                      : "Drop files to upload"
+                      }}
+                    </h3>
+                  </ngx-dropzone-label>
+                  <ng-container *ngFor="let f of uploadsPerControl(control)">
+                    <ngx-dropzone-preview [removable]="true" (removed)="onDelete(f, control, section.id)">
+                      <ngx-dropzone-label class="p-2" [title]="f.value.name + ' (' + f.value.type + ')'">{{ f.value.name
+                        |
+                        slice : 0 : 10
+                        }}{{ f.value.name.length > 10 ? "..." : "" }} ({{
+                        f.value.type | slice : 0 : 10
+                        }}){{ f.value.type.length > 10 ? "..." : "" }}
+                      </ngx-dropzone-label>
+                    </ngx-dropzone-preview>
+                  </ng-container>
+                </ngx-dropzone>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="
+                field.type === 'file_upload' &&
+                field.settings?.file_max !== 1 &&
+                field.readonly === false
+              ">
+              <div class="fv-row mb-2">
+                <ngx-dropzone (change)="onUpload($event, control, section.id)"
+                  [maxFileSize]="maxFileSize(field.settings?.file_max_size)"
+                  [accept]="fileSpecific(field.settings?.file_extensions)" [multiple]="true">
+                  <ngx-dropzone-label>
+                    <h3 class="fs-5 fw-bold text-gray-900 mb-1">
+                      {{
+                      field.placeholder
+                      ? field.placeholder
+                      : "Drop files to upload"
+                      }}
+                    </h3>
+                  </ngx-dropzone-label>
+                  <ng-container *ngFor="let f of uploadsPerControl(control)">
+                    <ngx-dropzone-preview [removable]="true" (removed)="onDelete(f, control, section.id)">
+                      <ngx-dropzone-label class="p-2" [title]="f.value.name + ' (' + f.value.type + ')'">{{ f.value.name
+                        |
+                        slice : 0 : 10
+                        }}{{ f.value.name.length > 10 ? "..." : "" }} ({{
+                        f.value.type | slice : 0 : 10
+                        }}){{ f.value.type.length > 10 ? "..." : "" }}
+                      </ngx-dropzone-label>
+                    </ngx-dropzone-preview>
+                  </ng-container>
+                </ngx-dropzone>
+              </div>
+            </ng-container>
+          </ng-container>
+
+          <ng-container *ngIf="field.type === 'file_upload' && (ticket_id || task_id)">
+            <span class="fs-7 fw-semibold" *ngIf="!field.readonly && task_id">Existing Attachment/s:</span>
+            <div class="fv-row overflow-y-auto mb-2 mh-500px">
+              <div class="p-1" *ngFor="let d of field.value">
+                <a [href]="d" target="_blank" class="mx-1">
+                  <ng-container *ngIf="allowedImageExtensions.includes(d | fileExtension)">
+                    <img [src]="d" width="320" />
+                  </ng-container>
+                  <ng-container *ngIf="allowedVideoExtensions.includes(d | fileExtension)">
+                    <video width="320" height="240" controls>
+                      <source [src]="d" type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  </ng-container>
+                  <ng-container *ngIf="allowedPdfExtensions.includes(d | fileExtension)">
+                    <div class="d-flex flex-column">
+                      <div class="mb-3">
+                        <iframe width="320" (click)="(d)" [src]="d | safe"></iframe>
+                        <div class="mt-1">
+                          <a class="bg-primary p-2 rounded text-white" [href]="d" target="_blank">Download</a>
+                        </div>
+                      </div>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="allowedSheetExtensions.includes(d | fileExtension)">
+                    <div class="d-flex flex-column">
+                      <div class="mb-3">
+                        <img src="./assets/media/icons/sheet.png" width="100" />
+                      </div>
+                      <div class="mt-1">
+                        <a class="bg-primary p-2 rounded text-white" [ngbTooltip]="d | fileName | truncate : 20"
+                          [href]="d" target="_blank">Download</a>
+                      </div>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="allowedDocExtensions.includes(d | fileExtension)">
+                    <div class="d-flex flex-column">
+                      <div class="mb-3">
+                        <img src="./assets/media/icons/docs.png" width="100" />
+                      </div>
+                      <div class="mt-1">
+                        <a class="bg-primary p-2 rounded text-white" [href]="d" target="_blank"
+                          [ngbTooltip]="d | fileName | truncate : 20" [title]="d">Download</a>
+                      </div>
+                    </div>
+                  </ng-container>
+                </a>
+              </div>
+            </div>
+          </ng-container> -->
+        </div>
+      </ng-template>
+
+    </form>
+    <!-- <div [style.display]="loading ? 'block' : 'none'" class="spinner_div">
+      <div id="spinner" class="flex-column bg-transparent">
+        <span class="spinner-border spinner-center text-primary" role="status"></span>
+        <span class="spinner spinner-primary spinner-right"></span>
+      </div>
+    </div> -->
+  </div>
+</ng-container>
